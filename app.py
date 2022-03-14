@@ -11,9 +11,11 @@ else:
     app.config.from_object("configs.dev_config.DevelopmentConfig")  # add config values in configs folder and
     # retrieve anywhere in the project using app.config("key")
 
+
 @app.route("/")
 def init_test():
     return "<h2>Welcome to Resident Service Portal.</h2><h3>Application is running.</h3>"
+
 
 @app.route("/users/authentication", methods=['POST', 'GET'])
 def index():
@@ -33,12 +35,13 @@ def index():
 @app.route("/service-requests", methods=['GET'])
 def get_all_service_requests():
     try:
-        data = ServiceRequest.get_all_requests()
-        return data, 200
+        service_request = ServiceRequest()
+        data = service_request.get_all_requests()
+        return {"response_data":data},200
     except Exception as e:
         logging.log(e.args)
         return "Exception occurred", 500
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5555)
+    app.run(debug=True, port=5556)

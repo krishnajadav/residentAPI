@@ -1,24 +1,18 @@
 import boto3
 from flask import current_app
 
+from vendors.helper import Helper
+
 
 class DynamoDB:
 
     def __init__(self):
+        self.session = Helper.get_session()
         self.resource = self.get_dynamodb_resource()
 
-    @staticmethod
-    def get_dynamodb_resource():
-        db = current_app.config("DB_NAME")
-        access_key = current_app.config("AWS_ACCESS_KEY_ID")
-        secret_key = current_app.config("AWS_SECRET_ACCESS_KEY")
-        region = current_app.config("AWS_REGION")
-        resource = boto3.resource(
-            db,
-            aws_access_key_id=access_key,
-            aws_secret_access_key=secret_key,
-            region_name=region
-        )
+    def get_dynamodb_resource(self):
+        db = current_app.config["DB_NAME"]
+        resource = self.session.resource(db, region_name=current_app.config["AWS_REGION"])
         return resource
 
     def insert(self, table_name, data):
