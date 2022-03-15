@@ -8,3 +8,12 @@ class ServiceRequest:
 
     def get_all_requests(self):
         return self.dynamo.get_all_records(self.TABLE_NAME)
+    
+    def insert_service_request(self, data):
+        return self.dynamo.insert(self.TABLE_NAME,data)
+    
+    def delete_service_request(self):
+        pass
+    
+    def update_service_request(self):
+        pass

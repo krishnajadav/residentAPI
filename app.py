@@ -41,6 +41,33 @@ def get_all_service_requests():
     except Exception as e:
         logging.log(e.args)
         return "Exception occurred", 500
+    
+    
+@app.route("/post-service-request", methods=['POST'])
+def store_service_request():
+    json_data = request.json
+    request_id = json_data["request_id"]
+    request_category = json_data["request_category"],
+    user_id = json_data["user_id"]
+    request_title = json_data["request_title"]
+    request_description = json_data["request_description"]
+    request_image = json_data["request_image"]
+    
+    try:
+        service_request = ServiceRequest()
+        data = {
+            "request_id": request_id,
+            "user_id": user_id, 
+            "request_category": request_category,
+            "request_title": request_title,
+            "request_description": request_description,
+            "request_image": request_image
+        }
+        response = service_request.insert_service_request(data)
+        return response, 200
+    except Exception as e:
+        logging.log(e.args)
+        return "Exception occured", 500
 
 
 if __name__ == "__main__":
