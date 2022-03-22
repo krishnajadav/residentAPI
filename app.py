@@ -9,11 +9,11 @@ table = dynamodb.Table('userInfo')
 
 app=Flask(__name__)
 CORS(app)
-if app.config("ENV") == "production":
+"""if app.config("ENV") == "production":
     app.config.from_object("configs.dev_config.ProductionConfig")
 else:
     app.config.from_object("configs.dev_config.DevelopmentConfig")  # add config values in configs folder and
-    # retrieve anywhere in the project using app.config("key")
+    # retrieve anywhere in the project using app.config("key")"""
 
 @app.route("/user/authentication",methods=['POST','GET'])
 def index():
@@ -34,12 +34,6 @@ def index():
 
 @app.route("/user/getUserData",methods=['POST','GET'])
 def getUserData():
-    class Object:
-        def toJSON(self):
-            return json.dumps(self, default=lambda o: o.__dict__, 
-                sort_keys=True, indent=4)
-
-
     rows = []
     rows.append({
                 'user_id': "1",
@@ -111,6 +105,103 @@ def checkAdminUser(username, password):
     except Exception as e:
         return None
     return "Admin"
+
+@app.route("/request/getRequestData",methods=['POST','GET'])
+def getRequestData():
+    
+    jsonInput = request.get_json()
+    ID=jsonInput['ID']
+    print(ID)
+
+    rows = []
+    rows.append({
+                'request_id': "1",
+                'request_category': "Krishna",
+                'request_title': "Jadav",
+                'request_description': "abc@gmail.com",
+                'request_image': "505",
+                'request_status': "0",
+    })
+
+    rows.append({
+                'request_id': "2",
+                'request_category': "Vignesh",
+                'request_title': "Nayak",
+                'request_description': "test@gmail.com",
+                'request_image': "501",
+                'request_status': "1",
+    })
+
+    response = {
+        'data': rows,
+        'recordsTotal': 5,
+        'recordsFiltered': 10,
+        'draw': 1,
+    }
+
+    return jsonify(response)
+
+
+@app.route("/request/getAllRequestData",methods=['POST','GET'])
+def getAllRequestData():
+    
+    rows = []
+    rows.append({
+                'request_id': "1",
+                'request_category': "Krishna",
+                'request_title': "Jadav",
+                'request_description': "abc@gmail.com",
+                'request_image': "505",
+                'user_uno': "505",
+                'user_fname': "Vignesh",
+                'request_status': "0",
+    })
+
+    rows.append({
+                'request_id': "2",
+                'request_category': "Vignesh",
+                'request_title': "Nayak",
+                'request_description': "test@gmail.com",
+                'request_image': "501",
+                'user_uno': "501",
+                'user_fname': "Krishna",
+                'request_status': "1",
+    })
+
+    response = {
+        'data': rows,
+        'recordsTotal': 5,
+        'recordsFiltered': 10,
+        'draw': 1,
+    }
+
+    return jsonify(response)
+
+@app.route("/request/insertRequestData",methods=['POST','GET'])
+def insertRequestData():
+    print(request.form['request_id'])
+    print(request.form['request_category'])
+    print(request.form['request_title'])
+    print(request.form['request_description'])
+    print(request.form['user_id'])
+    file = request.files['request_image']
+    print(file.filename)
+    return "1"
+
+@app.route("/request/deleteRequestData",methods=['POST','GET'])
+def deleteRequestData():
+    jsonInput = request.get_json()
+    ID=jsonInput['ID']
+    print(ID)
+    return "1"
+
+@app.route("/request/changeStatusData",methods=['POST','GET'])
+def changeStatusData():
+    jsonInput = request.get_json()
+    ID=jsonInput['request_id']
+    print(ID)
+    print(jsonInput['request_status'])
+    return "1"
 
 if __name__=="__main__":
     app.run(debug=True)    
