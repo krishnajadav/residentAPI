@@ -15,7 +15,6 @@ else:
     app.config.from_object("configs.dev_config.DevelopmentConfig")  # add config values in configs folder and
     # retrieve anywhere in the project using app.config("key")
 
-
 @app.route("/user/authentication",methods=['POST','GET'])
 def index():
     jsonInput = request.get_json()
@@ -32,6 +31,69 @@ def index():
             return jsonify(success=False, data="Invalid UserName and Password")
     else:
         return jsonify(success=True, data="Administrator Authenticate successfully")
+
+@app.route("/user/getUserData",methods=['POST','GET'])
+def getUserData():
+    class Object:
+        def toJSON(self):
+            return json.dumps(self, default=lambda o: o.__dict__, 
+                sort_keys=True, indent=4)
+
+
+    rows = []
+    rows.append({
+                'user_id': "1",
+                'user_fname': "Krishna",
+                'user_lname': "Jadav",
+                'user_email': "abc@gmail.com",
+                'user_uno': "505",
+                'user_pass': "test",
+    })
+
+    rows.append({
+                'user_id': "2",
+                'user_fname': "Vignesh",
+                'user_lname': "Nayak",
+                'user_email': "test@gmail.com",
+                'user_uno': "501",
+                'user_pass': "test",
+    })
+
+    response = {
+        'data': rows,
+        'recordsTotal': 5,
+        'recordsFiltered': 10,
+        'draw': 1,
+    }
+
+    return jsonify(response)
+
+@app.route("/user/checkUserData",methods=['POST','GET'])
+def checkUserData():
+    print(request.form['Id'])
+    print(request.form['fname'])
+    print(request.form['lname'])
+    print(request.form['email'])
+    print(request.form['uno'])
+    print(request.form['spass'])
+    return "1"
+
+@app.route("/user/insertUserData",methods=['POST','GET'])
+def insertUserData():
+    print(request.form['Id'])
+    print(request.form['fname'])
+    print(request.form['lname'])
+    print(request.form['email'])
+    print(request.form['uno'])
+    print(request.form['spass'])
+    return "1"
+
+@app.route("/user/deleteUserData",methods=['POST','GET'])
+def deleteUserData():
+    jsonInput = request.get_json()
+    ID=jsonInput['ID']
+    print(ID)
+    return "1"
 
 def checkAdminUser(username, password):
     try:
@@ -50,5 +112,5 @@ def checkAdminUser(username, password):
         return None
     return "Admin"
 
-if __name__ == "__main__":
-    app.run(debug=True, port=5555)
+if __name__=="__main__":
+    app.run(debug=True)    
