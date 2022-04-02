@@ -1,3 +1,4 @@
+from urllib import response
 import boto3
 from flask import current_app
 
@@ -19,6 +20,15 @@ class DynamoDB:
         table_res = self.resource.Table(table_name)
         response = table_res.put_item(
             Item=data
+        )
+        return response
+    
+    def delete(self, table_name, id):
+        table_res = self.resource.Table(table_name)
+        response = table_res.delete_item(
+            Key = {
+                'request_id': id
+            }
         )
         return response
 
