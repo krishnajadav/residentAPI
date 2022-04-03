@@ -189,6 +189,7 @@ def store_resident():
     email = json_data["email"]
     uno = json_data["uno"]
     spass = json_data["spass"]
+    phone_number = json_data["phone_number"]
 
     try:
         resident_obj = Resident()
@@ -197,7 +198,8 @@ def store_resident():
             "user_lastname": lname,
             "user_email": email,
             "user_uno": uno,
-            "user_password": spass
+            "user_password": spass,
+            "phone_number" : phone_number
         }
 
         if u_id == '0':
