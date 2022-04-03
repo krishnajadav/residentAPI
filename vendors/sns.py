@@ -1,6 +1,7 @@
 from flask import current_app
 from vendors.helper import Helper
 
+
 class SNS:
 
     def __init__(self):
@@ -14,6 +15,5 @@ class SNS:
 
     def publish_notification(self, topic_arn, message, subject):
         topic = self.resource.Topic(topic_arn)
-        response = topic.publish(Message = message, Subject = subject)
+        response = topic.publish(Message=message, Subject=subject)
         return response
-

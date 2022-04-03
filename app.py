@@ -5,6 +5,7 @@ from flask import Flask, request, json, jsonify
 from boto3.dynamodb.conditions import Key
 from entities.service_request import ServiceRequest
 from entities.resident import Resident
+from services.user_auth_service import UserAuth
 from entities.sns_operation import SNSOperation
 from flask_cors import CORS
 
@@ -25,19 +26,22 @@ def init_test():
     return "<h2>Welcome to Resident Service Portal.</h2><h3>Application is running.</h3>"
 
 
-@app.route("/users/authentication", methods=['POST', 'GET'])
+@app.route("/user/authentication", methods=['POST', 'GET'])
 def index():
-    json_input = json.loads(json.dumps(request.json))
-    dynamodb = boto3.resource(app.config["DB_NAME"])
-    table = dynamodb.Table('t_User_Info')
-    response = table.scan(
-        FilterExpression=Key('User_Name').eq(json_input['userName']) & Key('User_Password').eq(json_input['password'])
-    )
-
-    if len(response['Items']) == 1:
-        return "Authenticate successfully"
+    json_input = request.json
+    username = json_input['user_email']
+    password = json_input['user_password']
+    user_auth = UserAuth()
+    admin_result = user_auth.check_if_admin(username, password)
+    if admin_result != "Admin":
+        record = user_auth.scan_db_for_user(username, password)
+        if record:
+            user = record[0]
+            return jsonify(success=True, user_type="Resident", user_id=str(user["user_id"]))
+        else:
+            return jsonify(success=False, data="Invalid Username and Password")
     else:
-        return "Invalid UserName and Password"
+        return jsonify(success=True, user_type="Admin")
 
 
 @app.route("/service-requests", methods=['GET'])

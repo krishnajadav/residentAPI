@@ -11,3 +11,5 @@ class DevelopmentConfig(Config):
     AWS_REGION = "us-east-1"
     AWS_SESSION = ""
     BUCKET_NAME = "servicerequestimage"
+    COGNITO_CLIENT_ID = "2g2bbfsshtrt34fsp15sacir1r"
+    AUTH_FLOW = "USER_PASSWORD_AUTH"

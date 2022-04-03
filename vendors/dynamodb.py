@@ -1,5 +1,3 @@
-from urllib import response
-import boto3
 from flask import current_app
 
 from vendors.helper import Helper
@@ -50,12 +48,10 @@ class DynamoDB:
         )
         return response
 
-    def get_record(self, table_name, key, value):
+    def get_record(self, table_name, key_value_dict):
         table_res = self.resource.Table(table_name)
         response = table_res.get_item(
-            Key={
-                key: value
-            }
+            Key=key_value_dict
         )
         return response['Items']
 
@@ -63,3 +59,4 @@ class DynamoDB:
         table_res = self.resource.Table(table_name)
         response = table_res.scan()
         return response['Items']
+
