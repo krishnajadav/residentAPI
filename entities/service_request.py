@@ -7,7 +7,7 @@ import uuid
 
 class ServiceRequest:
     def __init__(self):
-        self.TABLE_NAME = "t_service_request"
+        self.TABLE_NAME = "request"
         self.dynamo = DynamoDB()
 
     def get_all_requests(self):
@@ -19,5 +19,5 @@ class ServiceRequest:
     def delete_service_request(self, id):
         response = self.dynamo.delete(self.TABLE_NAME, id)
     
-    def update_service_request(self):
-        pass
+    def update_service_request(self, request_id, data):
+        return self.dynamo.update(self.TABLE_NAME, request_id, data)

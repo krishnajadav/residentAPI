@@ -22,13 +22,34 @@ class DynamoDB:
             Item=data
         )
         return response
-    
+
     def delete(self, table_name, id):
         table_res = self.resource.Table(table_name)
         response = table_res.delete_item(
-            Key = {
+            Key={
                 'request_id': id
             }
+        )
+        return response
+
+    def update(self, table_name, id, data):
+        table_res = self.resource.Table(table_name)
+        update_expression = "SET"
+        expression_attribute_values = dict()
+        for key, value in data.items():
+            update_expression += f' {key}=:{key},'
+            expression_attribute_values[f':{key}'] = value
+        update_expression = update_expression.rstrip(",")
+        print(update_expression)
+        print(expression_attribute_values)
+
+        response = table_res.update_item(
+            Key={
+                'request_id': id
+            },
+            UpdateExpression=update_expression,
+            ExpressionAttributeValues=expression_attribute_values,
+            ReturnValues="UPDATED_NEW"
         )
         return response
 

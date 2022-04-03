@@ -1,14 +1,17 @@
 import uuid
 from crypt import methods
 import boto3
-from flask import Flask, request, json
+from flask import Flask, request, json, jsonify
 from boto3.dynamodb.conditions import Key
 from entities.service_request import ServiceRequest
 from entities.sns_operation import SNSOperation
+from flask_cors import CORS
 
 import logging
 
 app = Flask(__name__)
+CORS(app)
+
 if app.config["ENV"] == "production":
     app.config.from_object("configs.prod_config.ProductionConfig")
 else:
@@ -40,71 +43,79 @@ def index():
 def get_all_service_requests():
     try:
         service_request = ServiceRequest()
-        data = service_request.get_all_requests()
+        requests = service_request.get_all_requests()
+        response = {
+            'data': requests,
+        }
+        # sns = SNSOperation()
+        # sns.publish_notification("GET Requested", "By Admin")
 
-        sns = SNSOperation()
-        sns.publish_notification("GET Requested", "By Admin")
-
-        return {"response_data":data},200
-
+        return jsonify(response)
     except Exception as e:
         logging.log(e.args)
         return "Exception occurred", 500
-    
-    
-@app.route("/post-service-request", methods=['POST'])
+
+
+@app.route("/upsert-service-request", methods=['POST'])
 def store_service_request():
-    json_data = request.json
-    request_id = json_data["request_id"]
-    request_category = json_data["request_category"],
-    user_id = json_data["user_id"]
+    json_data = request.form
+    request_id = json_data["request_id"]    # if 0 insert, else update
+    request_category = json_data["request_category"]
     request_title = json_data["request_title"]
     request_description = json_data["request_description"]
-    request_image = json_data["request_image"]
-    
+    user_id = json_data["user_id"]
+    request_image = request.files["request_image"]
+    request_image = request_image.name
+    print(request_image)
+
     try:
         service_request = ServiceRequest()
         data = {
-            "request_id": uuid.uuid4(),
             "user_id": user_id,
             "request_category": request_category,
             "request_title": request_title,
             "request_description": request_description,
             "request_image": request_image
         }
-        response = service_request.insert_service_request(data)
 
-        sns = SNSOperation()
-        sns.publish_notification(f"Hi! You have a new service request: \n Request ID: {request_id} \n Request Title: {request_title}", f"New Service Request from {user_id}")
+        if request_id == '0':
+            data["request_id"] = str(uuid.uuid4())
+            print(f"inside insert \n data== {data}")
+            service_request.insert_service_request(data)
+        else:
+            print(f"inside update \n data== {data}\n request_id= {request_id}")
+            service_request.update_service_request(request_id, data)
 
-        return response, 200
+        # sns = SNSOperation()
+        # sns.publish_notification(
+        #     f"Hi! You have a new service request: \n Request ID: {request_id} \n Request Title: {request_title}",
+        #     f"New Service Request from {user_id}")
+
+        return str(1), 200
 
     except Exception as e:
         logging.log(e.args)
         return "Exception occured", 500
-    
 
-@app.route("/delete-request/<int:id>", methods=['DELETE'])
-def delete_request(id):
-    service_request = ServiceRequest()
-    response = service_request.delete_service_request(id);
-    
-    if (response['ResponseMetadata']['HTTPStatusCode'] == 200):
 
-        sns = SNSOperation()
-        sns.publish_notification(
-            f"Hi! A service request {id} has been deleted.",
-            f"Service request deleted")
-
-        return {
-            'msg': "Request deleted successfully"
-        }
-    else:
+@app.route("/delete-request", methods=['DELETE'])
+def delete_request():
+    try:
+        json_input = request.get_json()
+        request_id = json_input['ID']
+        service_request = ServiceRequest()
+        service_request.delete_service_request(request_id)
+        # sns = SNSOperation()
+        # sns.publish_notification(
+        #     f"Hi! A service request {id} has been deleted.",
+        #     f"Service request deleted")
+        return "1", 200
+    except Exception as e:
         return {
             'msg': 'Some error occured',
-            'response': response
+            'trace': e.with_traceback()
         }
 
-    
+
 if __name__ == "__main__":
     app.run(debug=True, port=5556)
