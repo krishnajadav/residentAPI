@@ -14,8 +14,9 @@ class ServiceRequest:
         return self.dynamo.get_all_records(self.TABLE_NAME)
 
     def insert_service_request(self, data, image):
-        # place image in s3 and store url in dynamodb
-        data["request_image"] = self.place_file_in_s3(data['request_id'], image)
+        if image:
+            # place image in s3 and store url in dynamodb
+            data["request_image"] = self.place_file_in_s3(data['request_id'], image)
         return self.dynamo.insert(self.TABLE_NAME, data)
 
     def delete_service_request(self, id):

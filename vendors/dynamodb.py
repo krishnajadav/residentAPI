@@ -49,11 +49,12 @@ class DynamoDB:
         return response
 
     def get_record(self, table_name, key_value_dict):
+        print(key_value_dict)
         table_res = self.resource.Table(table_name)
         response = table_res.get_item(
             Key=key_value_dict
         )
-        return response['Items']
+        return [response['Item']]
 
     def get_all_records(self, table_name):
         table_res = self.resource.Table(table_name)

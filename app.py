@@ -87,7 +87,7 @@ def store_service_request():
     request_description = json_data["request_description"]
     user_id = json_data["user_id"]
     request_status = json_data["request_status"]
-    request_image = request.files["request_image"]
+    request_image = request.files["request_image"] if "request_image" in request.files.keys() else None
 
     try:
         service_request = ServiceRequest()

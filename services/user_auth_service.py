@@ -1,5 +1,6 @@
 from vendors.cognito import Cognito
 from vendors.dynamodb import DynamoDB
+from entities.resident import Resident
 
 
 class UserAuth:
@@ -20,6 +21,9 @@ class UserAuth:
             return None
         return "Admin"
 
-    def check_user_in_db(self, username, password):
-        filter_dict = {"user_email": username, "user_password": password}
-        return self.dynamo.get_record(self.table_name, filter_dict)
+    def scan_db_for_user(self, username, password):
+        resident_obj = Resident()
+        residents = resident_obj.get_all_residents()
+        authorized_user = [resident for resident in residents
+                           if resident["user_email"] == username and resident["user_password"] == password]
+        return authorized_user
