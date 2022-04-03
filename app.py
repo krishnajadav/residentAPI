@@ -57,6 +57,23 @@ def get_all_service_requests():
         return "Exception occurred", 500
 
 
+@app.route("/admin/service-requests", methods=['GET'])
+def get_requests_for_admin():
+    try:
+        service_request = ServiceRequest()
+        requests = service_request.get_all_requests_for_admin()
+        response = {
+            'data': requests,
+        }
+        # sns = SNSOperation()
+        # sns.publish_notification("GET Requested", "By Admin")
+
+        return jsonify(response)
+    except Exception as e:
+        logging.log(e.args)
+        return "Exception occurred", 500
+
+
 @app.route("/upsert-service-request", methods=['POST'])
 def store_service_request():
     json_data = request.form
@@ -65,6 +82,7 @@ def store_service_request():
     request_title = json_data["request_title"]
     request_description = json_data["request_description"]
     user_id = json_data["user_id"]
+    request_status = json_data["request_status"]
     request_image = request.files["request_image"]
 
     try:
@@ -73,8 +91,8 @@ def store_service_request():
             "user_id": user_id,
             "request_category": request_category,
             "request_title": request_title,
-            "request_description": request_description
-            # "request_image": request_image
+            "request_description": request_description,
+            "request_status": request_status
         }
 
         if request_id == '0':
@@ -84,6 +102,31 @@ def store_service_request():
         else:
             print(f"inside update \n data== {data}\n request_id= {request_id}")
             service_request.update_service_request(request_id, data, request_image)
+
+        # sns = SNSOperation()
+        # sns.publish_notification(
+        #     f"Hi! You have a new service request: \n Request ID: {request_id} \n Request Title: {request_title}",
+        #     f"New Service Request from {user_id}")
+
+        return str(1), 200
+
+    except Exception as e:
+        logging.log(e.args)
+        return "Exception occured", 500
+
+
+@app.route("/requests/update-status", methods=['POST'])
+def update_request_status():
+    json_input = request.get_json()
+    request_id = json_input['request_id']
+    request_status = json_input['request_status']
+    try:
+        service_request = ServiceRequest()
+        data = {
+            "request_status": request_status
+        }
+        print(f"inside update \n data== {data}\n request_id= {request_id}")
+        service_request.update_service_request(request_id, data, None)
 
         # sns = SNSOperation()
         # sns.publish_notification(
@@ -188,6 +231,7 @@ def check_if_resident_exists():
     except Exception as e:
         logging.log(e.args)
         return "Exception occurred", 500
+
 
 @app.route("/delete-resident", methods=['DELETE'])
 def delete_resident():
