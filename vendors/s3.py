@@ -1,5 +1,6 @@
 from flask import current_app
 
+from vendors.cloudfront import CloudFront
 from vendors.helper import Helper
 
 
@@ -10,6 +11,7 @@ class S3:
         self.s3 = self.session.client('s3')
 
     def store_file(self, key, file):
+        cf = CloudFront()
         self.s3.put_object(Body=file, Bucket=self.bucket_name, Key=key)
-        url = f"http://{self.bucket_name}.s3.amazonaws.com/{key}"
+        url = cf.get_cloudfront_url(key)
         return url

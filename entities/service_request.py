@@ -26,6 +26,6 @@ class ServiceRequest:
         return self.dynamo.update(self.TABLE_NAME, request_id, data)
 
     def place_file_in_s3(self, request_id, image):
-        key = f"request-images/{request_id}/{image.filename.replace(' ', '%20')}"
+        key = f"request-images/{request_id}/{image.filename.replace(' ', '_')}"
         image_url = self.s3.store_file(key, image)
         return image_url
