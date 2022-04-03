@@ -65,8 +65,6 @@ def store_service_request():
     request_description = json_data["request_description"]
     user_id = json_data["user_id"]
     request_image = request.files["request_image"]
-    request_image = request_image.name
-    print(request_image)
 
     try:
         service_request = ServiceRequest()
@@ -74,17 +72,17 @@ def store_service_request():
             "user_id": user_id,
             "request_category": request_category,
             "request_title": request_title,
-            "request_description": request_description,
-            "request_image": request_image
+            "request_description": request_description
+            # "request_image": request_image
         }
 
         if request_id == '0':
             data["request_id"] = str(uuid.uuid4())
             print(f"inside insert \n data== {data}")
-            service_request.insert_service_request(data)
+            service_request.insert_service_request(data, request_image)
         else:
             print(f"inside update \n data== {data}\n request_id= {request_id}")
-            service_request.update_service_request(request_id, data)
+            service_request.update_service_request(request_id, data, request_image)
 
         # sns = SNSOperation()
         # sns.publish_notification(

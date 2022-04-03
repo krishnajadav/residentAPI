@@ -40,9 +40,6 @@ class DynamoDB:
             update_expression += f' {key}=:{key},'
             expression_attribute_values[f':{key}'] = value
         update_expression = update_expression.rstrip(",")
-        print(update_expression)
-        print(expression_attribute_values)
-
         response = table_res.update_item(
             Key={
                 'request_id': id

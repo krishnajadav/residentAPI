@@ -9,4 +9,5 @@ class ProductionConfig(Config):
     AWS_SESSION_TOKEN = "FwoGZXIvYXdzEMf//////////wEaDJRsLCbjR6BFVJc4yCLAAQC/xUVBAkNiXPoZZgLRCybUzfyzWHK7IOHCNKg3k5vI12lYVmfWNMIwGx4Nz24MjjeLuQUidtkja3JY85dI0vFWfoK7VvCdlZ/goF3UHYeKGXvKKj2Ct1xby3leBkRH9oyvXFYBHApwBRouf9OxTfbuu+zJE4L7qHV1MeqGvvcFoOKtKy9ac4P0ZyoGxHyo2SYStq7GDaWvu6CWLilKua/4XuQ4fOTEnBG9VhzKVzRN9AKQJyaS2pyPB/03GXBblyiwjqOSBjItQhxUOGOlD7sjpH5kQZgT2C9JuyMs04dR5bDwAi6lNUVsqe/gUmSecQQjdhOm"
     AWS_REGION = "us-east-1"
     AWS_SESSION = ""
+    BUCKET_NAME = "servicerequestimage"
 
