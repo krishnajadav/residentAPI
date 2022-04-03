@@ -4,6 +4,7 @@ import boto3
 from flask import Flask, request, json, jsonify
 from boto3.dynamodb.conditions import Key
 from entities.service_request import ServiceRequest
+from entities.resident import Resident
 from entities.sns_operation import SNSOperation
 from flask_cors import CORS
 
@@ -59,7 +60,7 @@ def get_all_service_requests():
 @app.route("/upsert-service-request", methods=['POST'])
 def store_service_request():
     json_data = request.form
-    request_id = json_data["request_id"]    # if 0 insert, else update
+    request_id = json_data["request_id"]  # if 0 insert, else update
     request_category = json_data["request_category"]
     request_title = json_data["request_title"]
     request_description = json_data["request_description"]
@@ -103,6 +104,98 @@ def delete_request():
         request_id = json_input['ID']
         service_request = ServiceRequest()
         service_request.delete_service_request(request_id)
+        # sns = SNSOperation()
+        # sns.publish_notification(
+        #     f"Hi! A service request {id} has been deleted.",
+        #     f"Service request deleted")
+        return "1", 200
+    except Exception as e:
+        return {
+            'msg': 'Some error occured',
+            'trace': e.with_traceback()
+        }
+
+
+@app.route("/users", methods=['GET'])
+def get_all_users():
+    try:
+        resident_obj = Resident()
+        residents = resident_obj.get_all_residents()
+        response = {
+            'data': residents,
+        }
+        # sns = SNSOperation()
+        # sns.publish_notification("GET Requested", "By Admin")
+
+        return jsonify(response)
+    except Exception as e:
+        logging.log(e.args)
+        return "Exception occurred", 500
+
+
+@app.route("/upsert-resident", methods=['POST'])
+def store_resident():
+    json_data = request.form
+    u_id = json_data["Id"]  # if 0 insert, else update
+    fname = json_data["fname"]
+    lname = json_data["lname"]
+    email = json_data["email"]
+    uno = json_data["uno"]
+    spass = json_data["spass"]
+
+    try:
+        resident_obj = Resident()
+        data = {
+            "user_firstname": fname,
+            "user_lastname": lname,
+            "user_email": email,
+            "user_uno": uno,
+            "user_password": spass
+        }
+
+        if u_id == '0':
+            data["user_id"] = str(uuid.uuid4())
+            print(f"inside insert \n data== {data}")
+            resident_obj.insert_resident(data)
+        else:
+            print(f"inside update \n data== {data}\n request_id= {u_id}")
+            resident_obj.update_resident(u_id, data)
+
+        # sns = SNSOperation()
+        # sns.publish_notification(
+        #     f"Hi! You have a new service request: \n Request ID: {request_id} \n Request Title: {request_title}",
+        #     f"New Service Request from {user_id}")
+
+        return str(1), 200
+
+    except Exception as e:
+        logging.log(e.args)
+        return "Exception occured", 500
+
+
+@app.route("/check-resident", methods=["POST"])
+def check_if_resident_exists():
+    """
+    :return: 1 if resident is new and does not exist in the database
+    """
+    try:
+        json_data = request.form
+        data = {
+            "user_email": json_data["email"]
+        }
+        resident_obj = Resident()
+        return resident_obj.resident_doesnot_exist(data)
+    except Exception as e:
+        logging.log(e.args)
+        return "Exception occurred", 500
+
+@app.route("/delete-resident", methods=['DELETE'])
+def delete_resident():
+    try:
+        json_input = request.get_json()
+        user_id = json_input['ID']
+        resident_obj = Resident()
+        resident_obj.delete_service_request(user_id)
         # sns = SNSOperation()
         # sns.publish_notification(
         #     f"Hi! A service request {id} has been deleted.",
