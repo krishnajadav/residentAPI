@@ -52,8 +52,6 @@ def get_all_service_requests():
         response = {
             'data': requests,
         }
-        # sns = SNSOperation()
-        # sns.publish_notification("GET Requested", "By Admin")
 
         return jsonify(response)
     except Exception as e:
@@ -69,8 +67,6 @@ def get_requests_for_admin():
         response = {
             'data': requests,
         }
-        # sns = SNSOperation()
-        # sns.publish_notification("GET Requested", "By Admin")
 
         return jsonify(response)
     except Exception as e:
@@ -99,18 +95,21 @@ def store_service_request():
             "request_status": request_status
         }
 
+        sns = SNSOperation()
+
         if request_id == '0':
             data["request_id"] = str(uuid.uuid4())
             print(f"inside insert \n data== {data}")
             service_request.insert_service_request(data, request_image)
+            sns.publish_notification(
+                f"Hi! You have a new service request: \n Request ID: {data['request_id']} \n Request Category: {request_category} \n Request Title: {request_title}",
+                f"New Service Request from {user_id}")
         else:
             print(f"inside update \n data== {data}\n request_id= {request_id}")
             service_request.update_service_request(request_id, data, request_image)
-
-        # sns = SNSOperation()
-        # sns.publish_notification(
-        #     f"Hi! You have a new service request: \n Request ID: {request_id} \n Request Title: {request_title}",
-        #     f"New Service Request from {user_id}")
+            sns.publish_notification(
+                f"Hi! Service request updated: \n Request ID: {request_id} \n Request Title: {request_title}",
+                f"New Service Request from {user_id}")
 
         return str(1), 200
 
@@ -134,7 +133,7 @@ def update_request_status():
 
         # sns = SNSOperation()
         # sns.publish_notification(
-        #     f"Hi! You have a new service request: \n Request ID: {request_id} \n Request Title: {request_title}",
+        #     f"Hi! Status has been updated: \n Request ID: {request_id} \n Request Title: {request_title}",
         #     f"New Service Request from {user_id}")
 
         return str(1), 200
@@ -151,10 +150,10 @@ def delete_request():
         request_id = json_input['ID']
         service_request = ServiceRequest()
         service_request.delete_service_request(request_id)
-        # sns = SNSOperation()
-        # sns.publish_notification(
-        #     f"Hi! A service request {id} has been deleted.",
-        #     f"Service request deleted")
+        sns = SNSOperation()
+        sns.publish_notification(
+            f"Hi! A service request {id} has been deleted.",
+            f"Service request deleted")
         return "1", 200
     except Exception as e:
         return {
@@ -171,8 +170,6 @@ def get_all_users():
         response = {
             'data': residents,
         }
-        # sns = SNSOperation()
-        # sns.publish_notification("GET Requested", "By Admin")
 
         return jsonify(response)
     except Exception as e:
@@ -206,14 +203,11 @@ def store_resident():
             data["user_id"] = str(uuid.uuid4())
             print(f"inside insert \n data== {data}")
             resident_obj.insert_resident(data)
+            sns = SNSOperation()
+            sns.publish_text_message("+1"+phone_number, f"Welcome to Resident Service Portal. Please find your login details for the website. \n Email: {email} \n Password: {spass}")
         else:
             print(f"inside update \n data== {data}\n request_id= {u_id}")
             resident_obj.update_resident(u_id, data)
-
-        # sns = SNSOperation()
-        # sns.publish_notification(
-        #     f"Hi! You have a new service request: \n Request ID: {request_id} \n Request Title: {request_title}",
-        #     f"New Service Request from {user_id}")
 
         return str(1), 200
 
@@ -246,10 +240,6 @@ def delete_resident():
         user_id = json_input['ID']
         resident_obj = Resident()
         resident_obj.delete_service_request(user_id)
-        # sns = SNSOperation()
-        # sns.publish_notification(
-        #     f"Hi! A service request {id} has been deleted.",
-        #     f"Service request deleted")
         return "1", 200
     except Exception as e:
         return {

@@ -1,6 +1,6 @@
+from botocore.exceptions import ClientError
 from flask import current_app
 from vendors.helper import Helper
-
 
 class SNS:
 
@@ -17,3 +17,38 @@ class SNS:
         topic = self.resource.Topic(topic_arn)
         response = topic.publish(Message=message, Subject=subject)
         return response
+
+    def create_new_topic(self, topic_name):
+        topic = self.resource.create_topic(Name=topic_name)
+        return topic
+
+    def subscribe_to_topic(self, topic_name, protocol, endpoint):
+        """
+
+        :param topic_name: topic to subscribe to
+        :param protocol: 'email' / 'sms'
+        :param endpoint: email_id / phone_number
+        :return: subscription
+        """
+        subscription = topic_name.subscribe(Protocol=protocol, Endpoint=endpoint, ReturnSubscriptionArn=True)
+        return subscription
+
+    def publish_text_message(self, phone_number, message):
+        try:
+            response = self.resource.meta.client.publish(
+                PhoneNumber=phone_number, Message=message)
+            message_id = response['MessageId']
+            print("SNSSUCCESS")
+        except ClientError:
+            print("SNSERROR")
+            raise
+        else:
+            print("SNSERROR")
+            return message_id
+
+
+
+
+
+
+
