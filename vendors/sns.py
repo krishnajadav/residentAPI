@@ -38,12 +38,9 @@ class SNS:
             response = self.resource.meta.client.publish(
                 PhoneNumber=phone_number, Message=message)
             message_id = response['MessageId']
-            print("SNSSUCCESS")
         except ClientError:
-            print("SNSERROR")
             raise
         else:
-            print("SNSERROR")
             return message_id
 
 

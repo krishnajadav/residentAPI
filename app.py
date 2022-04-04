@@ -99,13 +99,11 @@ def store_service_request():
 
         if request_id == '0':
             data["request_id"] = str(uuid.uuid4())
-            print(f"inside insert \n data== {data}")
             service_request.insert_service_request(data, request_image)
             sns.publish_notification(
                 f"Hi! You have a new service request: \n Request ID: {data['request_id']} \n Request Category: {request_category} \n Request Title: {request_title}",
                 f"New Service Request from {user_id}")
         else:
-            print(f"inside update \n data== {data}\n request_id= {request_id}")
             service_request.update_service_request(request_id, data, request_image)
             sns.publish_notification(
                 f"Hi! Service request updated: \n Request ID: {request_id} \n Request Title: {request_title}",
@@ -128,13 +126,7 @@ def update_request_status():
         data = {
             "request_status": request_status
         }
-        print(f"inside update \n data== {data}\n request_id= {request_id}")
         service_request.update_service_request(request_id, data, None)
-
-        # sns = SNSOperation()
-        # sns.publish_notification(
-        #     f"Hi! Status has been updated: \n Request ID: {request_id} \n Request Title: {request_title}",
-        #     f"New Service Request from {user_id}")
 
         return str(1), 200
 
@@ -201,12 +193,10 @@ def store_resident():
 
         if u_id == '0':
             data["user_id"] = str(uuid.uuid4())
-            print(f"inside insert \n data== {data}")
             resident_obj.insert_resident(data)
             sns = SNSOperation()
             sns.publish_text_message("+1"+phone_number, f"Welcome to Resident Service Portal. Please find your login details for the website. \n Email: {email} \n Password: {spass}")
         else:
-            print(f"inside update \n data== {data}\n request_id= {u_id}")
             resident_obj.update_resident(u_id, data)
 
         return str(1), 200
