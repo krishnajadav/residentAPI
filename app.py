@@ -44,11 +44,13 @@ def index():
         return jsonify(success=True, user_type="Admin")
 
 
-@app.route("/service-requests", methods=['GET'])
+@app.route("/service-requests", methods=['POST'])
 def get_all_service_requests():
     try:
+        js_data = request.get_json()
+        user_id = js_data["ID"]
         service_request = ServiceRequest()
-        requests = service_request.get_all_requests()
+        requests = service_request.get_user_requests(user_id)
         response = {
             'data': requests,
         }

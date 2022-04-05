@@ -13,6 +13,11 @@ class ServiceRequest:
     def get_all_requests(self):
         return self.dynamo.get_all_records(self.TABLE_NAME)
 
+    def get_user_requests(self, user_id):
+        all_requests = self.dynamo.get_all_records(self.TABLE_NAME)
+        filtered_requests = [request for request in all_requests if request["user_id"] == user_id]
+        return filtered_requests
+
     def insert_service_request(self, data, image):
         if image:
             # place image in s3 and store url in dynamodb
