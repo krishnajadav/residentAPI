@@ -1,3 +1,3 @@
-# csci5409-group42-residentAPI
+# residentAPI
 
 Backend API for residents
